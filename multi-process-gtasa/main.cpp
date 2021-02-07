@@ -11,7 +11,7 @@ void EnableMultiProcess()
 		VirtualProtect((LPVOID)0x74872D, 9, 0x40, &OldProtect);
 		*reinterpret_cast<DWORD *>(0x74872D) = 0x90909090;
 		*reinterpret_cast<DWORD *>(0x748731) = 0x90909090;
-		*reinterpret_cast<BYTE *>(0x748735) = 0xA0;
+		*reinterpret_cast<BYTE *>(0x748735) = 0x90;
 		VirtualProtect((LPVOID)0x74872D, 9, OldProtect, &OldProtect);
 
 		VirtualProtect((LPVOID)0x406946, 4, 0x40, &OldProtect2);
