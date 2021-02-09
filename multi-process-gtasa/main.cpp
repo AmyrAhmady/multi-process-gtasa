@@ -10,9 +10,7 @@ void EnableMultiProcess()
 
 		// Enable windowed mode that can be activated using Enter+Alt (or Alt+Enter for some people)
 		VirtualProtect((LPVOID)0x74872D, 9, 0x40, &OldProtect);
-		*reinterpret_cast<DWORD *>(0x74872D) = 0x90909090;
-		*reinterpret_cast<DWORD *>(0x748731) = 0x90909090;
-		*reinterpret_cast<BYTE *>(0x748735) = 0x90;
+		memset((void*)0x74872D, 0x90, 9);
 		VirtualProtect((LPVOID)0x74872D, 9, OldProtect, &OldProtect);
 
 		// Disable more than one gtasa instance check so we can run more than one
