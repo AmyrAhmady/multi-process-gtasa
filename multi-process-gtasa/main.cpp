@@ -1,4 +1,36 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <Windows.h>
+#include "injector/injector.hpp"
+
+struct RsGlobalType
+{
+	char * AppName;
+	int MaximumWidth;
+	int MaximumHeight;
+	int frameLimit;
+	int quit;
+	int ps;
+};
+
+DWORD _EAX;
+void __declspec(naked) AllowMouseMovement()
+{
+	_asm
+	{
+		mov _EAX, eax
+		mov eax, dword ptr ds : [0x8D621C]
+		cmp eax, 0
+		jne label1
+		mov eax, _EAX
+		ret
+
+		label1 :
+		mov eax, _EAX
+			mov _EAX, 0x7453F0
+			jmp _EAX
+	}
+}
 
 void EnableMultiProcess()
 {
@@ -7,16 +39,20 @@ void EnableMultiProcess()
 		&& *reinterpret_cast<DWORD *>(0x4028A2) == 0xE1FB058D)
 	{
 		DWORD OldProtect;
+		RsGlobalType * RsGlobal = reinterpret_cast<RsGlobalType *>(0xC17040);
 
 		// Enable windowed mode that can be activated using Enter+Alt (or Alt+Enter for some people)
-		VirtualProtect((LPVOID)0x74872D, 9, 0x40, &OldProtect);
-		memset((void*)0x74872D, 0x90, 9);
-		VirtualProtect((LPVOID)0x74872D, 9, OldProtect, &OldProtect);
+		injector::MakeNOP(0x74872D, 9, true);
 
 		// Disable more than one gtasa instance check so we can run more than one
-		VirtualProtect((LPVOID)0x406946, 4, 0x40, &OldProtect);
-		*reinterpret_cast<DWORD *>(0x406946) = 0;
-		VirtualProtect((LPVOID)0x406946, 4, OldProtect, &OldProtect);
+		injector::WriteMemory<DWORD>(0x406946, 0x00, true);
+
+		// Disable MENU AFTER alt + tab
+		injector::WriteMemory<uint8_t>(0x53BC78, 0x00, true);
+
+		// ALLOW ALT+TABBING WITHOUT PAUSING
+		injector::MakeNOP(0x748A8D, 6, true);
+		injector::MakeJMP(0x6194A0, AllowMouseMovement, true);
 	}
 }
 
