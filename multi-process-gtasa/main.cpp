@@ -27,8 +27,8 @@ void __declspec(naked) AllowMouseMovement()
 
 		label1 :
 		mov eax, _EAX
-			mov _EAX, 0x7453F0
-			jmp _EAX
+		mov _EAX, 0x7453F0
+		jmp _EAX
 	}
 }
 
@@ -41,16 +41,16 @@ void EnableMultiProcess()
 		DWORD OldProtect;
 		RsGlobalType * RsGlobal = reinterpret_cast<RsGlobalType *>(0xC17040);
 
-		// Enable windowed mode that can be activated using Enter+Alt (or Alt+Enter for some people)
+		// Disable more than one gtasa instance check so we can run more than one
 		injector::MakeNOP(0x74872D, 9, true);
 
-		// Disable more than one gtasa instance check so we can run more than one
+		// Enable windowed mode that can be activated using Enter+Alt (or Alt+Enter for some people)
 		injector::WriteMemory<DWORD>(0x406946, 0x00, true);
 
-		// Disable MENU AFTER alt + tab
+		// Disable menu after Alt+Tab
 		injector::WriteMemory<uint8_t>(0x53BC78, 0x00, true);
 
-		// ALLOW ALT+TABBING WITHOUT PAUSING
+		// Allow Alt+Tab'ing without pausing
 		injector::MakeNOP(0x748A8D, 6, true);
 		injector::MakeJMP(0x6194A0, AllowMouseMovement, true);
 	}
